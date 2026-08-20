@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><title>Gelir Yazdırma Seçim İşlemleri</title>
+<style>body{font-family:Tahoma;font-size:13px;padding:14px}
+ h4{background:#4a7ebb;color:#fff;padding:6px;margin:0 0 14px;text-align:center}
+ td{padding:6px}</style></head>
+<body>
+<h4>İmzalayan Seçimi</h4>
+<table>
+ <tr>
+  <td>İmzalayan Adı :</td>
+  <td>
+    <select id="ddlImzalayan">
+      <option>OKUL MÜDÜRÜ</option>
+      <option>MÜDÜR YARDIMCISI</option>
+    </select>
+  </td>
+ </tr>
+ <tr><td colspan="2"><input type="button" id="btnTamam" value="Tamam" onclick="onayla()"></td></tr>
+</table>
+<script>
+function onayla() {
+  var kisi = document.getElementById('ddlImzalayan').value;
+  if (window.opener && window.opener.imzaOnaylandi) window.opener.imzaOnaylandi(kisi);
+  window.close();
+}
+</script>
+</body></html>

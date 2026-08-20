@@ -1,0 +1,109 @@
+<!doctype html><html lang='tr'><head><meta charset='utf-8'>
+<title>Ekstre Okuma ve Öğrenci Eşleştirme Raporu</title><style>
+:root{--lacivert:#0f2d4a;--mavi:#1a6fb5;--yesil:#12805c;--sari:#b6791f;
+--gri:#5b6b7b;--cizgi:#e2e8f0;--zemin:#f6f8fb;}
+*{box-sizing:border-box;}
+body{margin:0;padding:32px 24px;background:var(--zemin);color:#16232f;
+font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;font-size:14px;}
+.sayfa{max-width:1180px;margin:0 auto;}
+header{border-bottom:3px solid var(--lacivert);padding-bottom:16px;margin-bottom:8px;}
+h1{margin:0 0 6px;font-size:23px;color:var(--lacivert);letter-spacing:-.2px;}
+.altbaslik{color:var(--gri);font-size:13px;}
+.rozet{display:inline-block;background:var(--lacivert);color:#fff;font-size:11px;
+font-weight:600;padding:3px 9px;border-radius:11px;letter-spacing:.4px;margin-left:8px;
+vertical-align:middle;}
+.kartlar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:14px;margin:22px 0 26px;}
+.kart{background:#fff;border:1px solid var(--cizgi);border-radius:10px;padding:16px 18px;
+border-top:3px solid var(--mavi);}
+.kart.ok{border-top-color:var(--yesil);} .kart.uyari{border-top-color:var(--sari);}
+.kart.pas{border-top-color:var(--gri);} .kart.gecmis{border-top-color:#3a5f9e;}
+.kart .sayi{font-size:30px;font-weight:700;color:var(--lacivert);line-height:1.1;}
+.kart .etiket{font-size:12px;color:var(--gri);margin-top:5px;}
+h2{font-size:16px;color:var(--lacivert);margin:30px 0 10px;
+border-left:4px solid var(--mavi);padding-left:10px;}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--cizgi);
+border-radius:8px;overflow:hidden;}
+th{background:var(--lacivert);color:#fff;text-align:left;font-size:12px;font-weight:600;
+padding:10px 11px;white-space:nowrap;}
+td{padding:9px 11px;border-top:1px solid var(--cizgi);vertical-align:top;}
+tbody tr:nth-child(even){background:#fafcfe;}
+.sag{text-align:right;white-space:nowrap;}
+.tc{font-family:Consolas,monospace;letter-spacing:.4px;}
+.ad{font-weight:600;}
+.ham{color:var(--gri);font-size:12px;line-height:1.45;}
+.etiketli{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;
+border-radius:10px;white-space:nowrap;}
+.e-ok{background:#e3f5ee;color:var(--yesil);}
+.e-uyari{background:#fdf3e0;color:var(--sari);}
+.e-pas{background:#eef1f5;color:var(--gri);}
+.e-gecmis{background:#e8effa;color:#3a5f9e;}
+.nasil{font-size:11px;color:var(--gri);margin-top:3px;}
+footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--cizgi);
+color:var(--gri);font-size:12px;line-height:1.7;}
+.not{background:#fff8e6;border:1px solid #f0dca8;border-left:4px solid var(--sari);
+border-radius:6px;padding:12px 15px;margin:18px 0;font-size:13px;line-height:1.6;}
+</style></head><body>
+<div class='sayfa'><header>
+<h1>Ekstre Okuma ve Öğrenci Eşleştirme Raporu<span class='rozet'>DEMO</span></h1>
+<div class='altbaslik'>oluşturulma: 20.08.2026 20:55 &middot; kaynak: test_ekstre.xlsx</div>
+<div class='altbaslik' style='margin-top:5px'><b>ÖRNEK ANAOKULU OKUL AİLE BİRLİĞİ</b> &middot; dönem: 01.05.2026 - 30.05.2026</div>
+</header>
+<div class='kartlar'>
+<div class="kart "><div class="sayi">41</div><div class="etiket">ekstredeki hareket</div></div>
+<div class="kart ok"><div class="sayi">20</div><div class="etiket">TEFBİS'e girilecek kayıt</div></div>
+<div class="kart uyari"><div class="sayi">3</div><div class="etiket">onayın beklenen kayıt</div></div>
+<div class="kart pas"><div class="sayi">18</div><div class="etiket">aidat olmadığı için elenen</div></div>
+</div>
+<div class='not'><b>Bu bir demo çıktısıdır.</b> Gönderdiğiniz Mayıs ekstresi hiç elle düzeltilmeden, olduğu gibi okundu. T.C. numaraları <b>örnek listeden</b> gelmektedir — gerçek öğrenci kimlik numarası kullanılmamıştır. Tutarlar dosyada sizin tarafınızdan maskelendiği için aynı görünüyor; program gerçek tutarları da aynı şekilde okur. Gerçek kullanımda kendi öğrenci listeniz okunur ve veriler bilgisayarınızdan hiçbir yere gönderilmez.</div>
+<h2>TEFBİS'e girilecek kayıtlar (20)</h2>
+<table><thead><tr><th>Tarih</th><th>Evrak No</th><th>Öğrenci</th><th>T.C. No</th><th class='sag'>Tutar</th><th>Durum</th><th>Ekstredeki açıklama</th></tr></thead><tbody>
+<tr><td>02.05.2026</td><td>F10001</td><td class='ad'>Bade Naz ÖZTÜRKMEN</td><td class='tc'>10000000078</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: SEHER ÖZTÜRKMEN Bade Naz ÖZTÜRKMEN mayıs</td></tr>
+<tr><td>03.05.2026</td><td>F10002</td><td class='ad'>Tuna Efe TAŞDELEN</td><td class='tc'>10000123760</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: NERMİN TAŞDELEN Tuna Efe TAŞDELEN mayıs ayı</td></tr>
+<tr><td>04.05.2026</td><td>F10003</td><td class='ad'>Ozan AYDINLI</td><td class='tc'>10000618556</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: BİRSEN AYDINLI Ozan AYDINLI -Mayıs ödemesi</td></tr>
+<tr><td>05.05.2026</td><td>F10004</td><td class='ad'>İpek AYDINLI</td><td class='tc'>10000742206</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: SEVİM AYDINLI İpek AYDINLI mayıs</td></tr>
+<tr><td>06.05.2026</td><td>F10005</td><td class='ad'>Umut Efe AYDINLI</td><td class='tc'>10000865998</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: NAZLI AYDINLI Umut Efe AYDINLI mayıs ödemesi</td></tr>
+<tr><td>07.05.2026</td><td>F10006</td><td class='ad'>Doruk AYDINLI</td><td class='tc'>10000989670</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: PERİHAN AYDINLI Doruk AYDINLI aidat</td></tr>
+<tr><td>08.05.2026</td><td>F10007</td><td class='ad'>Aras Kaan SEVİNDİK</td><td class='tc'>10001237060</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: JALE SEVİNDİK Aras Kaan SEVİNDİK mayıs</td></tr>
+<tr><td>09.05.2026</td><td>F10008</td><td class='ad'>Ediz Ali GÖKMENLER</td><td class='tc'>10001484402</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: ŞENAY GÖKMENLER Ediz Ali GÖKMENLER aidat</td></tr>
+<tr><td>10.05.2026</td><td>F10009</td><td class='ad'>Peri YILDIRIMLI</td><td class='tc'>10001608174</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: BENGİ YILDIRIMLI Peri YILDIRIMLI mayıs ayı</td></tr>
+<tr><td>11.05.2026</td><td>F10010</td><td class='ad'>Lina Nur KESKİNER</td><td class='tc'>10001855516</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: REYHAN KESKİNER Lina Nur KESKİNER ödeme</td></tr>
+<tr><td>12.05.2026</td><td>F10011</td><td class='ad'>Beren KARTAL</td><td class='tc'>10000247442</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: GAMZE KARTAL Mayıs ayı beren artal 0067-Yapı ve Kredi</td></tr>
+<tr><td>13.05.2026</td><td>F10012</td><td class='ad'>Ceylin TUNÇEL</td><td class='tc'>10000494884</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%92)</div></td><td class='ham'>Gönd: HANDE TUNCAL Ceylin TUNCAL mayis ayı aydatı</td></tr>
+<tr><td>14.05.2026</td><td>F10013</td><td class='ad'>Kuzey Asaf BOZDOĞAN</td><td class='tc'>10001731834</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: FİGEN BOZDOĞAN mayıs ayı ödemesi</td></tr>
+<tr><td>15.05.2026</td><td>F10014</td><td class='ad'>Efe Han ÇAKIROĞLU</td><td class='tc'>10001113388</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: TAYFUN ÇAKIROĞLU mayıs kulüp ücreti</td></tr>
+<tr><td>17.05.2026</td><td>F10016</td><td class='ad'>Irmak ULUTÜRK</td><td class='tc'>10001979298</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>açıklamada T.C. yazılmış</div></td><td class='ham'>10001979298 nolu öğrenci aidatı</td></tr>
+<tr><td>18.05.2026</td><td>F10017</td><td class='ad'>Poyraz Eren ŞENGÜLER</td><td class='tc'>10002102916</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>açıklamada T.C. yazılmış</div></td><td class='ham'>AİDAT 10002102916</td></tr>
+<tr><td>11.05.2026</td><td>F50002</td><td class='ad'>Irmak ULUTÜRK</td><td class='tc'>10001979298</td><td class='sag'>1.499,99</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: SEVİL ULUTÜRK Irmak ULUTÜRK aidat</td></tr>
+<tr><td>12.05.2026</td><td>F50003</td><td class='ad'>Poyraz Eren ŞENGÜLER</td><td class='tc'>10002102916</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: NALAN ŞENGÜLER Poyraz Eren ŞENGÜLER mayıs</td></tr>
+<tr><td>13.05.2026</td><td>F50004</td><td class='ad'>Zeytin ARIKBOĞA</td><td class='tc'>10002226698</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: SELDA ARIKBOĞA Zeytin ARIKBOĞA mayıs ayı</td></tr>
+<tr><td>14.05.2026</td><td>F50005</td><td class='ad'>Alperen MERTOĞLU</td><td class='tc'>10002350348</td><td class='sag'>1.500,00</td><td><span class='etiketli e-ok'>hazır</span><div class='nasil'>isimden eşleşti (%100)</div></td><td class='ham'>Gönd: İLKNUR MERTOĞLU Alperen MERTOĞLU mayıs aidatı</td></tr>
+</tbody></table>
+<h2>Emin olunamayan, onayınızı bekleyen kayıtlar (3)</h2>
+<table><thead><tr><th>Tarih</th><th>Evrak No</th><th>Program ne düşünüyor</th><th class='sag'>Tutar</th><th>Ekstredeki açıklama</th></tr></thead><tbody>
+<tr><td>16.05.2026</td><td>F10015</td><td><span class='etiketli e-uyari'>onay bekliyor</span><div class='nasil'>Beren KARTAL (%100), Bulut KARTAL (%100)</div></td><td class='sag'>1.500,00</td><td class='ham'>Gönd: SERHAT KARTAL mayıs ayı aidat</td></tr>
+<tr><td>19.05.2026</td><td>F20001</td><td><span class='etiketli e-uyari'>onay bekliyor</span><div class='nasil'>Zümra Su ERGÜVEN (%100)</div></td><td class='sag'>5.000,00</td><td class='ham'>Gönd: SUNA ERGÜVEN SUNA ERGÜVEN Bağış 0046-Akbank T.A.Ş</td></tr>
+<tr><td>01.05.2026</td><td>F30003</td><td><span class='etiketli e-uyari'>onay bekliyor</span><div class='nasil'>Peri YILDIRIMLI (%100), İpek AYDINLI (%54)</div></td><td class='sag'>-1.500,00</td><td class='ham'>Gönd: BENGİ YILDIRIMLI Peri YILDIRIMLI fazla ödeme iadesi</td></tr>
+</tbody></table>
+<h2>Aidat olmadığı için girilmeyen hareketler (18)</h2>
+<table><thead><tr><th>Tarih</th><th>Evrak No</th><th>Neden girilmedi</th><th class='sag'>Tutar</th><th>Ekstredeki açıklama</th></tr></thead><tbody>
+<tr><td>20.05.2026</td><td>F20002</td><td><span class='etiketli e-pas'>öğrenci listesinde eşleşen isim yok</span></td><td class='sag'>4.200,00</td><td class='ham'>KANTİN GELİRİ MAYIS</td></tr>
+<tr><td>21.05.2026</td><td>F20003</td><td><span class='etiketli e-pas'>öğrenci listesinde eşleşen isim yok</span></td><td class='sag'>8.000,00</td><td class='ham'>KİRA GELİRİ - SPOR SALONU</td></tr>
+<tr><td>22.05.2026</td><td>F20004</td><td><span class='etiketli e-pas'>öğrenci listesinde eşleşen isim yok</span></td><td class='sag'>312,45</td><td class='ham'>FAİZ GELİRİ</td></tr>
+<tr><td>23.05.2026</td><td>F20005</td><td><span class='etiketli e-pas'>öğrenci listesinde eşleşen isim yok</span></td><td class='sag'>5.000,00</td><td class='ham'>AKTARIM - OKUL AİLE BİRLİĞİ</td></tr>
+<tr><td>24.05.2026</td><td>F20006</td><td><span class='etiketli e-pas'>denetim payı</span></td><td class='sag'>450,00</td><td class='ham'>DENETİM PAYI</td></tr>
+<tr><td>25.05.2026</td><td>F20007</td><td><span class='etiketli e-pas'>banka masrafı</span></td><td class='sag'>45,00</td><td class='ham'>MESAJ ÜCRETİ TUTARI</td></tr>
+<tr><td>26.05.2026</td><td>F20008</td><td><span class='etiketli e-pas'>banka masrafı</span></td><td class='sag'>12,75</td><td class='ham'>BSMV TUTARI</td></tr>
+<tr><td>27.05.2026</td><td>F30001</td><td><span class='etiketli e-pas'>personel maaşı</span></td><td class='sag'>-22.936,29</td><td class='ham'>AYŞE PERSONEL MAAŞ ÖDEMESİ AYŞE PERSONEL İnternet Havale</td></tr>
+<tr><td>28.05.2026</td><td>F30002</td><td><span class='etiketli e-pas'>hesaptan çıkan para</span></td><td class='sag'>-3.120,55</td><td class='ham'>ELEKTRİK FATURASI</td></tr>
+<tr><td>02.05.2026</td><td>F30004</td><td><span class='etiketli e-pas'>vergi / resmi kesinti</span></td><td class='sag'>-4.210,10</td><td class='ham'>INTERNET SGK( EMS/BAĞ/SSK)/ 00000000000000000000000000 /</td></tr>
+<tr><td>03.05.2026</td><td>F40001</td><td><span class='etiketli e-pas'>öğrenci listesinde eşleşen isim yok</span></td><td class='sag'>1.500,00</td><td class='ham'>Gönd: AHMET YOLCU havale</td></tr>
+<tr><td>04.05.2026</td><td>F40002</td><td><span class='etiketli e-pas'>öğrenci listesinde eşleşen isim yok</span></td><td class='sag'>1.500,00</td><td class='ham'>Gönd: NURAY BEKTAŞLI ödeme</td></tr>
+<tr><td>05.05.2026</td><td>F40003</td><td><span class='etiketli e-pas'>öğrenci listesinde eşleşen isim yok</span></td><td class='sag'>1.500,00</td><td class='ham'>Gönd: HÜSEYİN ARABACI aidat</td></tr>
+<tr><td>06.05.2026</td><td>F40004</td><td><span class='etiketli e-pas'>öğrenci listesinde eşleşen isim yok</span></td><td class='sag'>1.500,00</td><td class='ham'>Gönd: SEMRA KOÇYİĞİT mayıs</td></tr>
+<tr><td>07.05.2026</td><td>F40005</td><td><span class='etiketli e-pas'>öğrenci listesinde eşleşen isim yok</span></td><td class='sag'>1.500,00</td><td class='ham'>Gönd: RECEP TANRIVERDİ ödeme</td></tr>
+<tr><td>08.05.2026</td><td>F40006</td><td><span class='etiketli e-pas'>öğrenci listesinde eşleşen isim yok</span></td><td class='sag'>1.500,00</td><td class='ham'>Gönd: HAVVA SARIOĞLU aidat</td></tr>
+<tr><td>09.05.2026</td><td>F40007</td><td><span class='etiketli e-pas'>öğrenci listesinde eşleşen isim yok</span></td><td class='sag'>1.500,00</td><td class='ham'>Gönd: İSMAİL KURTULUŞ mayıs</td></tr>
+<tr><td>10.05.2026</td><td>F50001</td><td><span class='etiketli e-pas'>açıklama boş - öğrenciyi kendiniz seçin</span></td><td class='sag'>1.500,00</td><td class='ham'></td></tr>
+</tbody></table>
+<footer>Açıklamasına T.C. yazılmış 2 kayıt doğrudan alındı ve kimlik algoritmasıyla doğrulandı, 16 kayıt öğrenci listesindeki isimle eşleştirildi. Yazım hataları, ismin başta veya sonda yazılması ve banka açıklama farklılıkları programın kendisi tarafından tolere edilir.<br>Veriler bu bilgisayarın dışına çıkmaz, hiçbir sunucuya gönderilmez.</footer></div></body></html>

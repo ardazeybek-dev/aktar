@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Kişi Seçimi</title>
+<style>
+ body{font-family:Tahoma,Arial;font-size:13px;padding:12px}
+ td{padding:4px 8px}
+ table.sonuc{border-collapse:collapse;margin-top:10px}
+ table.sonuc td{border:1px solid #bbb;cursor:pointer}
+ table.sonuc tr:hover td{background:#ffe9a8}
+ .uyari{color:red}
+</style>
+</head>
+<body>
+
+<b>Kişi Seçimi</b>
+<br><br>
+<table>
+  <tr>
+    <td>T.C. Kimlik No :</td>
+    <td><input type="text" id="txtTc"></td>
+    <td><input type="button" id="btnAra" value="Ara" onclick="ara()"></td>
+  </tr>
+</table>
+<div id="uyari" class="uyari"></div>
+
+<div id="sonucAlani"></div>
+
+<script>
+// Test icin sahte ogrenci kayitlari
+var KAYITLI = {
+  "99976892504": "BADE NAZ ÖZTÜRKMEN",
+  "99928440050": "ILKE SAVRAN",
+  "99983501420": "PERI YILDIRIMLI",
+  "99942469136": "LINA NUR KESKINER",
+  "99938901558": "KUZEY ASAF BOZDOGAN"
+};
+
+function ara() {
+  var tc = document.getElementById('txtTc').value.trim();
+  var alan = document.getElementById('sonucAlani');
+  document.getElementById('uyari').innerHTML = '';
+
+  if (tc.length !== 11) {
+    document.getElementById('uyari').innerHTML = 'T.C. Kimlik Numarası 11 hane olmalıdır';
+    alan.innerHTML = '';
+    return;
+  }
+  var ad = KAYITLI[tc];
+  if (!ad) {
+    document.getElementById('uyari').innerHTML = 'Kayıt bulunamadı';
+    alan.innerHTML = '';
+    return;
+  }
+  alan.innerHTML =
+    '<table class="sonuc"><tr onclick="sec(\'' + tc + '\',\'' + ad + '\')">' +
+    '<td>' + tc + '</td><td>' + ad + '</td><td><a href="#">Seç</a></td></tr></table>';
+}
+
+function sec(tc, ad) {
+  if (window.opener && window.opener.kisiSec) {
+    window.opener.kisiSec(tc, ad);
+  }
+  window.close();
+}
+</script>
+</body>
+</html>

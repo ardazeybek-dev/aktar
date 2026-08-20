@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>TEFBİS - Öz Bakım Ücreti Gelirleri Kaydı</title>
+<style>
+ body{font-family:Tahoma,Arial;font-size:13px;background:#eef3f8;margin:0}
+ #menu{float:left;width:210px;background:#dbe5f1;padding:8px;height:520px}
+ #menu a{display:block;padding:5px;color:#123;text-decoration:none}
+ #menu a:hover{background:#c3d4e8}
+ #govde{margin-left:230px;padding:14px;background:#fff}
+ h3{background:#1f4e79;color:#fff;padding:6px;margin:0 0 12px}
+ td{padding:5px}
+ .kirmizi{color:red;font-weight:bold}
+</style>
+</head>
+<body>
+
+<div id="menu">
+  <b>Genel Bilgiler</b>
+  <b>Gelir İşlemleri</b>
+  <a href="#" id="mnuOzBakim">Öz Bakım Ücreti Gelirleri</a>
+  <a href="#">Diğer Gelirler</a>
+  <a href="#">Aktarım Gelirleri</a>
+  <b>Gider İşlemleri</b>
+  <a href="#">Okul Öncesi Birimleri Modülü</a>
+  <a href="#">Okul Aile Birlikleri Modülü</a>
+</div>
+
+<div id="govde">
+<h3>Öz Bakım Ücreti Gelirleri Kaydı - İşlem Genel Bilgileri</h3>
+
+<table>
+  <tr>
+    <td>Ödeyen Tipi :</td>
+    <td>
+      <select id="ddlOdeyenTipi">
+        <option value="">Seçiniz</option>
+        <option>Öğrenciler</option>
+        <option>Veliler</option>
+        <option>Personel/Öğretmen</option>
+      </select>
+    </td>
+    <td rowspan="2">
+      <input type="button" id="btnKisiEkle" value="Kişi/Kurum Ekle"
+             onclick="window.open('secici.html','secici','width=560,height=380')">
+    </td>
+    <td>Evrak No :</td>
+    <td><input type="text" id="txtEvrakNo"></td>
+  </tr>
+  <tr>
+    <td>Ödeyen :</td>
+    <td><input type="text" id="txtOdeyen" readonly></td>
+    <td>Evrak Tarihi :</td>
+    <td><input type="text" id="txtEvrakTarihi" value="19/08/2026"></td>
+  </tr>
+  <tr>
+    <td>Açıklama :</td>
+    <td colspan="4"><textarea id="txtAciklama" rows="2" cols="60"></textarea></td>
+  </tr>
+</table>
+
+<hr>
+<b>Evrak Detay Bilgileri</b> &nbsp;&nbsp;
+Toplam Tutar : <span id="lblToplam" class="kirmizi">0,00 TL</span>
+<br><br>
+<input type="button" id="btnDetayEkle" value="Detay Kayıt Ekle"
+       onclick="document.getElementById('detay').style.display='table'">
+
+<table id="detay" style="display:none">
+  <tr>
+    <td>Türü :</td>
+    <td>
+      <select id="ddlTuru">
+        <option>Öz Bakım Ücreti Gelirleri</option>
+        <option>Diğer Gelirler</option>
+      </select>
+    </td>
+    <td>Tutar :</td>
+    <td><input type="text" id="txtTutar"></td>
+    <td>Satır Toplamı</td>
+    <td>Detay Açıklaması :</td>
+    <td><input type="text" id="txtDetayAciklama"></td>
+  </tr>
+</table>
+
+<br>
+<input type="button" id="btnKaydet" value="Kaydet" onclick="kaydet()">
+<input type="button" id="btnIptal" value="İptal" onclick="temizle()">
+<div id="sonuc"></div>
+
+<script>
+// Secim penceresi bu fonksiyonu cagirir (gercek TEFBIS de boyle calisir)
+function kisiSec(tc, ad) {
+  document.getElementById('txtOdeyen').value = tc + ' - ' + ad;
+}
+
+function kaydet() {
+  var tc = document.getElementById('txtOdeyen').value;
+  var evrak = document.getElementById('txtEvrakNo').value;
+  var tutar = document.getElementById('txtTutar').value;
+  if (!tc || !evrak || !tutar) {
+    document.getElementById('sonuc').innerHTML =
+      '<span class="kirmizi" style="color:red">Zorunlu alanlar boş bırakılamaz</span>';
+    return;
+  }
+  // Gercek TEFBIS gibi: once IMZALAYAN SECIMI ekrani acilir.
+  // Kayit ancak "Tamam"a basildiktan sonra olusur.
+  document.getElementById('sonuc').innerHTML = 'İmzalayan seçimi bekleniyor...';
+  window.open('imzalayan.html', 'imza', 'width=520,height=300');
+}
+
+function imzaOnaylandi(imzalayan) {
+  var tc = document.getElementById('txtOdeyen').value;
+  var evrak = document.getElementById('txtEvrakNo').value;
+  var tutar = document.getElementById('txtTutar').value;
+  // kaydedilen satiri gorunur bir yere yaz (test bunu okuyacak)
+  var kayitlar = document.getElementById('kayitlar');
+  if (!kayitlar) {
+    kayitlar = document.createElement('div');
+    kayitlar.id = 'kayitlar';
+    document.body.appendChild(kayitlar);
+  }
+  kayitlar.innerHTML += '<div class="kayit">' + evrak + '|' + tc + '|' + tutar
+                        + '|' + document.getElementById('txtEvrakTarihi').value + '</div>';
+  document.getElementById('sonuc').innerHTML = 'Kayıt eklendi (' + imzalayan + ')';
+  temizle();
+  window.open('cikti.html', 'cikti', 'width=600,height=400');
+}
+
+function temizle() {
+  document.getElementById('txtOdeyen').value = '';
+  document.getElementById('txtEvrakNo').value = '';
+  document.getElementById('txtTutar').value = '';
+  document.getElementById('txtAciklama').value = '';
+  document.getElementById('detay').style.display = 'none';
+}
+</script>
+</div>
+</body>
+</html>
