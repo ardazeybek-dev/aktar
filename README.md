@@ -1,23 +1,40 @@
+<div align="center">
+
 # Aktar
 
-**Banka ekstresini okur, ödemeleri kişilerle eşleştirir, web paneline sizin yerinize girer.**
+**Reads a bank statement, works out who paid what, and enters the records into a web panel for you.**
 
-Ayda 100 küsur havaleyi tek tek bir panele elle girmek zorunda kalan herkes için:
-okul, dernek, apartman yönetimi, kurs, küçük muhasebe bürosu. Aktar ekstreyi okur,
-"kim ne ödemiş"i çözer, sonra kayıtları hedef panele **sizin oturumunuzda** girer.
+[![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Playwright](https://img.shields.io/badge/playwright-1.40%2B-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev/python/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows&logoColor=white)](https://github.com/ardazeybek-dev/aktar/releases)
+[![Tests](https://img.shields.io/badge/tests-113%20passing-brightgreen)](#testing)
 
-![Aktar ana ekran](docs/06-eslestirme-sonucu.png)
+[Türkçe README](README.tr.md) · [Download for Windows](https://github.com/ardazeybek-dev/aktar/releases)
+
+</div>
+
+![Aktar main screen](docs/06-eslestirme-sonucu.png)
+
+> **Note on language:** the source code, the UI and the inline comments are in
+> Turkish. The problem is Turkish too — Turkish name matching, Turkish number
+> formats, Turkish government panels. This README is in English so the approach
+> and the architecture can be read by anyone.
 
 ---
 
-## Sorun
+## The problem
 
-Bir anaokulunun aylık işi şöyleydi: bankadan ekstre indir, Excel'de aç, her satırın
-kime ait olduğunu bul, sonra devletin panelinde her çocuk için 9-10 tıklama yap.
-Ayda 80-130 kayıt. Yaklaşık iki tam iş günü.
+Anyone who has to type a hundred-odd bank transfers into a web panel by hand
+every month: a school, an association, a building management office, a small
+accounting practice.
 
-Zor kısım tıklamak değil, **ekstreyi anlamak**. Veliler açıklamaya ne isterlerse
-onu yazıyor:
+The case this was built for: a preschool entering parents' monthly fees into a
+government panel. 80–130 records a month, 9–10 clicks each. About two full
+working days.
+
+The hard part was never the clicking. It was **understanding the statement**.
+Parents write whatever they like in the transfer description:
 
 ```
 Gönd: SEHER ÖZTÜRKMEN Bade Naz ÖZTÜRKMEN (Mayıs Klüp Ödemesi) 0015-...FAST işlemi
@@ -25,32 +42,35 @@ Gönd: GAMZE KARTAL Mayıs ayı beren artal 0067-Yapı ve Kredi
 Tuna Efe TAŞDELEN, mayıs ayı kulüb ücreti NERMİN TAŞDELEN Ziraat Mobil Havale
 ```
 
-Çocuğun adı bazen başta, bazen sonda, bazen hiç yok — sadece annenin adı var.
-Soyadın baş harfi düşmüş (`beren artal` → **Beren KARTAL**). `klup / klüp / kulüb /
-klub`, `aidat / aydat`. Aynı soyadlı dört ayrı aile var ve karıştırılmamalı.
-Arada aidat olmayan gelirler (bağış, kantin, kira, faiz) var, onlar girilmemeli.
+The child's name is sometimes first, sometimes last, sometimes absent entirely —
+only the mother's name is there. A surname is missing its first letter
+(`beren artal` → **Beren KARTAL**). The word for "club" is spelled four different
+ways. Four separate families share a surname and must not be confused with one
+another. Mixed in are payments that are *not* fees at all — donations, canteen
+income, rent, interest — which must never be entered.
 
-## Çözüm
+## What it does
 
-Üç aşama, üçü de ayrı ve tek başına anlamlı:
+Three stages, each meaningful on its own:
 
-| Aşama | Ne yapar | Dosya |
+| Stage | What it does | Source |
 |---|---|---|
-| **Oku** | Ekstreyi çözer: başlık satırını kendi bulur, Türkçe sayı formatını (`-22.936,29`) anlar, banka antetini ve dipnotlarını atar | `src/ekstre.py` |
-| **Eşleştir** | Serbest metinden kişiyi çıkarır, kişi listesiyle bulanık eşleştirir, her satıra **kesin / şüpheli / yok** kararı verir | `src/eslestir.py` |
-| **Aktar** | Kayıtları hedef panele girer — panele özel her şey bir *tarif* dosyasından gelir | `src/panel.py` + `src/tarifler/` |
+| **Read** | Parses the statement: finds the header row itself, understands Turkish number format (`-22.936,29`), discards the bank's letterhead and footnotes | [`src/ekstre.py`](src/ekstre.py) |
+| **Match** | Extracts a person from free text, fuzzy-matches against a roster, and rules every row **certain / uncertain / none** | [`src/eslestir.py`](src/eslestir.py) |
+| **Enter** | Drives the target panel — everything panel-specific comes from a *recipe* file | [`src/panel.py`](src/panel.py) · [`src/tarifler/`](src/tarifler/) |
 
-Şüpheli olan **asla** kendiliğinden girilmez; kullanıcıya sorulur.
+An uncertain match is **never** entered on its own. It is handed back to the user.
 
 ---
 
-## Teknik olarak ilginç kısımlar
+## Technical highlights
 
-### 1. Kırılgan CSS id'sine bağlanmayan seçici
+### 1. Selectors that don't break when the panel changes
 
-Hedef paneller çoğunlukla eski ASP.NET WebForms. `ctl00$ContentPlaceHolder1$txtEvrakNo`
-gibi id'ler sürüm değişiminde kayar ve otomasyon sessizce ölür. Aktar alanları
-**ekrandaki etiket metninden** bulur — "Evrak No :" yazan hücrenin yanındaki input:
+The panels this targets are mostly legacy ASP.NET WebForms. Ids like
+`ctl00$ContentPlaceHolder1$txtEvrakNo` shift between releases and the automation
+dies silently. Aktar locates fields **by the label text on screen** instead — the
+input next to the cell that reads "Evrak No :":
 
 ```python
 xpath=//*[self::td or self::label or self::span or self::div]
@@ -59,109 +79,137 @@ xpath=//*[self::td or self::label or self::span or self::div]
       /following::input[1]
 ```
 
-`[not(*)]` kısmı sonradan eklendi ve kritik: onsuz, sayfanın tamamını saran bir `div`
-de "Evrak No" metnini *içerdiği* için eşleşiyor ve yanlış input bulunuyordu. Yaprak
-düğüm şartı bunu çözer. `string-length < 40` de aynı işi ikinci bir açıdan yapar.
+The `[not(*)]` predicate was added after a real failure and is the load-bearing
+part: without it, a `<div>` wrapping the entire page also *contains* the text
+"Evrak No", matches, and yields the wrong input. Requiring a leaf node fixes it;
+`string-length < 40` guards the same problem from a second angle.
 
-Benzer bir tuzak: ekranda hem "Toplam Tutar" hem detay satırında "Tutar" var.
-Sadece "Tutar" arayınca ikisi de eşleşiyordu. Tarif başına **hariç metin** listesi
-bunu çözer.
+A related trap: the screen shows both "Toplam Tutar" (total) and, on the detail
+row, "Tutar" (amount). Searching for "Tutar" matched both. Each recipe therefore
+carries a per-field **exclusion list**.
 
-### 2. Türkçe bulanık isim eşleştirme
+### 2. Turkish fuzzy name matching
 
-`rapidfuzz` üstünde Türkçeye özel bir normalizasyon katmanı: `ğ/ü/ş/ı/ö/ç`
-sadeleştirme, ay adları ve banka gürültüsü (`gönd`, `fast işlemi`, `havale`,
-`kulüp`, `aidat`) temizliği, sonra token bazlı skor.
+A Turkish-specific normalisation layer on top of `rapidfuzz`: folding
+`ğ/ü/ş/ı/ö/ç`, stripping month names and banking noise (`gönd`, `fast işlemi`,
+`havale`, `kulüp`, `aidat`), then token-based scoring.
 
-Karar üç eşikle veriliyor:
+The decision uses three thresholds:
 
 ```python
-ESIK_KESIN = 88   # üstü otomatik kabul
-ESIK_SUPHE = 72   # üstü kullanıcıya sorulur, altı eşleşmedi
-FARK_ESIGI = 6    # en iyi ile ikinci aday arasındaki fark bundan azsa: şüpheli
+ESIK_KESIN = 88   # above this, accept automatically
+ESIK_SUPHE = 72   # above this, ask the user; below, no match
+FARK_ESIGI = 6    # if the top two candidates are closer than this: uncertain
 ```
 
-Son satır en önemlisi. Skor 91 olsa bile ikinci aday 88'deyse program karar
-vermez — çünkü aynı soyadlı iki aile varken yüksek skor "doğru" demek değil.
+The last one matters most. Even at a score of 91, if the runner-up sits at 88 the
+program refuses to decide — because when two families share a surname, a high
+score does not mean *correct*. Precision is worth more than coverage here: a
+wrongly attributed payment is far more expensive than one the user has to
+confirm by hand.
 
-Yakalanan gerçek senaryolar: `TUNCAL ↔ TUNÇEL` (ünlü harf hatası), `beren artal ↔
-Beren KARTAL` (baş harf düşmesi), aynı veliye bağlı iki kardeş (→ şüpheli, kullanıcı
-seçer), eksi tutarda isim tutması (→ şüpheli, para hesaptan çıkmış).
+Real cases it handles: `TUNCAL ↔ TUNÇEL` (vowel error), `beren artal ↔ Beren
+KARTAL` (dropped initial), two siblings under one parent (→ uncertain, user
+picks), a name that matches on a negative amount (→ uncertain, the money left
+the account).
 
-> **Bir kenar durum:** ay adları gürültü sayılıp atılıyor. Test verisindeki bir
-> çocuğun adı "Nisan" olunca adı elendi ve eşleşme şüpheliye düştü. Gerçek bir
-> kısıt — ad olarak da kullanılan ay isimleri (Nisan, Şubat) bu filtreye takılır.
+> **A known limitation:** month names are treated as noise and stripped. When a
+> child in the test data was named "Nisan" (April), the name was stripped and the
+> match fell through to uncertain. Turkish given names that are also month names
+> — Nisan, Şubat — hit this filter.
 
-### 3. Bir satır patlarsa döngü durmaz
+### 3. One failed row doesn't stop the run
 
-100 kaydın 47'ncisinde panel hata verirse kalan 53'ü de kaybetmek kabul edilemez.
-Her kayıt kendi `try` bloğunda; hata yakalanır, form temizlenir, sıradaki satıra
-geçilir. Sonunda hangi satırın neden girilemediği raporlanır.
+If the panel errors on record 47 of 100, losing the remaining 53 is not
+acceptable. Every record runs in its own `try`; the error is caught, the form is
+reset, the loop moves to the next row. At the end the user gets a report of which
+rows failed and why.
 
-Hata tespiti de göründüğünden ince: panelin kırmızı uyarı metni büyük/küçük harf
-karışık geliyor. Küçük harfli kalıpla ararken "Zorunlu Alanlar Boş Bırakılamaz"
-görülmüyordu ve program kaydı **başarılı sanıyordu** — sessiz veri kaybı.
+Detecting the failure turned out to be subtler than expected. The panel's red
+warning text arrives in mixed case. Matching against lowercase patterns meant
+"Zorunlu Alanlar Boş Bırakılamaz" *was never seen* — and the program counted the
+record as saved. Silent data loss, the worst kind of bug in this class of tool.
 
-### 4. Aynı kayıt iki kez girilmez
+### 4. The same record is never entered twice
 
-Her kaydın `(tarih, evrak no, TC, kuruş)` dörtlüsünden bir parmak izi üretilip
-saklanıyor. Aynı ekstre ikinci kez işlenirse o satırlar `girildi` olarak
-işaretlenir ve tekrar gönderilmez.
+Each record is fingerprinted from `(date, document no, national id, cents)` and
+stored. If the same statement is processed again, those rows are marked as
+already entered and skipped.
 
-### 5. Şifre programda yok
+### 5. No credentials in the program
 
-Program hiçbir kimlik bilgisi tutmaz, sormaz, göndermez. Tarayıcı açılır,
-**girişi kullanıcı kendisi yapar**, motor sadece girişin tamamlanmasını bekler.
+Aktar never stores, requests or transmits a credential. It opens the browser,
+**the user signs in themselves**, and the engine simply waits for the session to
+be ready. It then enters the user's own data, under the user's own authority, in
+the user's own session.
 
-Programın kendi açılış şifresi de diske yazılmaz — yalnızca PBKDF2-SHA256
-özeti (200.000 tur) saklanır. Lisans sunucusu yoktur, internet gerekmez.
+The program's own launch password is not written to disk either — only a
+PBKDF2-SHA256 digest (200,000 rounds) is kept. There is no licence server and no
+network access is required.
 
-### 6. Yanında 150 MB tarayıcı taşımaz
+### 6. It doesn't ship a 150 MB browser
 
-Playwright kendi Chromium'unu indirmek yerine önce bilgisayardaki Chrome'a,
-olmazsa Edge'e bağlanır. Bağlanma yolu da normal bir Chrome başlatıp CDP
-üzerinden ona bağlanmak — böylece kullanıcının kendi profili, kendi oturumu,
-kendi eklentileri geçerli olur.
+Rather than downloading Playwright's bundled Chromium, it attaches to the Chrome
+already installed on the machine, falling back to Edge. It does so by launching a
+normal Chrome and connecting over CDP, so the user's own profile, session and
+extensions apply — and the distributed package stays portable.
 
-### 7. openpyxl'in açamadığı Excel'i kurtarır
+### 7. It recovers Excel files openpyxl refuses to open
 
-Bankadan indirilen ya da Google Sheets / LibreOffice / eski Excel'den geçmiş
-dosyalarda openpyxl'in tanımadığı dolgu ve yazı tipi tanımları oluyor, dosya
-hiç açılmıyor:
+Files exported from banks, or round-tripped through Google Sheets, LibreOffice or
+older Excel, often carry fill and font definitions openpyxl doesn't recognise.
+The file simply won't open:
 
 ```
 TypeError: expected <class 'openpyxl.styles.fills.Fill'>
 ```
 
-Veri sağlam — bozulan sadece hücrenin **görünüşü**. `src/excel_ac.py` geçici bir
-kopyada yalnızca görsel stil bloklarını (`fills`, `fonts`, `borders`) varsayılanla
-değiştirip yeniden deniyor.
+The data is intact — only the cell's *appearance* is malformed.
+[`src/excel_ac.py`](src/excel_ac.py) retries on a temporary copy in which only
+the visual style blocks (`fills`, `fonts`, `borders`) are replaced with defaults.
 
-İnce nokta: sayı biçimleri (`numFmts`) ve hücre-stil eşlemesi (`cellXfs`) **asla**
-silinmiyor. Excel'de tarih bir sayıdır; tarih olduğu sayı biçiminden anlaşılır.
-O blok da temizlenseydi bütün tarihler `45900` olarak okunurdu — dosya açılırdı,
-program çalışırdı, sonuç sessizce yanlış olurdu. Blok *sayıları* da korunuyor ki
-`cellXfs` içindeki `fillId` / `fontId` referansları geçerli kalsın.
+The subtle part: number formats (`numFmts`) and the cell-style mapping (`cellXfs`)
+are **never** stripped. In Excel a date *is* a number; what makes it a date is its
+number format. Clearing that block too would have made every date read back as
+`45900` — the file would open, the program would run, and the output would be
+quietly wrong. Block *counts* are preserved as well, so `fillId` / `fontId`
+references inside `cellXfs` stay valid.
 
-Testler bunu doğruluyor: onarım sonrası satır sayısı, tarihlerin gerçekten tarih
-nesnesi olduğu, tutarlar ve T.C. numaraları tek tek karşılaştırılıyor.
+The test suite verifies the repair: row counts, dates still being real date
+objects, amounts and national ids are all compared one by one.
 
 ---
 
-## Yeni bir panel eklemek
+## Architecture: the engine doesn't know the panel
 
-Motor hangi panele girdiğini bilmez. Panele özel her şey bir tarif dosyasındadır:
+`panel.py` is a generic driver. Everything specific to a target — addresses,
+field labels, button captions, screen flow — lives in a **recipe**.
+
+```
+src/
+├── panel.py            generic engine: find-by-label, waits, error isolation, the loop
+├── tarifler/
+│   ├── temel.py        the contract a recipe fulfils
+│   └── tefbis.py       worked example: a Turkish MoNE revenue-entry panel
+├── ekstre.py           statement reader
+├── eslestir.py         matcher
+├── excel_ac.py         Excel recovery
+└── arayuz.py           desktop UI — reads its options from the recipe
+```
+
+A minimal recipe:
 
 ```python
+from panel import tr_tutar
 from tarifler.temel import Tarif
 
-class BenimPanelim(Tarif):
-    ad = "Örnek Panel"
-    giris_adresleri = {"ana": "https://ornek.gov.tr/"}
-    etiketler = {"evrak_no": ("Evrak No", "Evrak No :"),
-                 "tutar": ("Tutar", "Tutar :")}
-    haric_metinler = {"tutar": ("Toplam",)}
-    butonlar = {"kaydet": ("Kaydet",)}
+class MyPanel(Tarif):
+    ad = "Example Panel"
+    giris_adresleri = {"main": "https://example.gov.tr/"}
+    etiketler = {"evrak_no": ("Document No", "Document No :"),
+                 "tutar": ("Amount", "Amount :")}
+    haric_metinler = {"tutar": ("Total",)}
+    butonlar = {"kaydet": ("Save",)}
 
     def kayit_gir(self, motor, kayit):
         motor.zorunlu_alan("evrak_no").fill(str(kayit["evrak_no"]))
@@ -169,63 +217,76 @@ class BenimPanelim(Tarif):
         motor.dugme("kaydet").click()
 ```
 
-Dosyayı `src/tarifler/` altına koyup `TARIFLER` listesine ekleyin — arayüz
-seçim kutularını, giriş adreslerini ve modları tariften okur, kendisi değişmez.
+Drop it in `src/tarifler/` and add it to the `TARIFLER` list. The desktop UI
+reads its dropdowns, mode buttons and login addresses from the recipe — adding a
+panel means touching no UI code at all.
 
-Tam bir örnek: [`src/tarifler/tefbis.py`](src/tarifler/tefbis.py) (MEB TEFBİS
-gelir kayıt ekranı, 354 satır).
+The full worked example is [`src/tarifler/tefbis.py`](src/tarifler/tefbis.py)
+(354 lines), which drives the revenue-entry screen of TEFBİS, a Turkish Ministry
+of National Education system. It is included as a *reference implementation*, not
+as the product.
+
+**Vocabulary**, since the code is Turkish: `tarif` = recipe, `panel` = panel,
+`ekstre` = bank statement, `eslestir` = match, `kayit` = record, `motor` =
+engine, `tutar` = amount, `dugme` = button, `alan` = field.
 
 ---
 
-## Kurulum
+## Installation
 
-Hazır exe: [Releases](https://github.com/ardazeybek-dev/aktar/releases) sayfasından
-indirip çalıştırın — Python kurmaya gerek yok.
+**Windows, ready to run:** grab the zip from
+[Releases](https://github.com/ardazeybek-dev/aktar/releases), extract the whole
+folder and run `Aktar.exe`. No Python required. Chrome or Edge must be installed.
 
-Kaynaktan:
+**From source:**
 
 ```bash
 git clone https://github.com/ardazeybek-dev/aktar.git
 cd aktar
 pip install -r requirements.txt
-python -m playwright install chromium   # sistemde Chrome/Edge yoksa
+python -m playwright install chromium   # only if neither Chrome nor Edge is present
 python aktar.py
 ```
 
-Python 3.11+. Bağımlılıklar: `openpyxl`, `rapidfuzz`, `playwright`.
+Python 3.10+. Runtime dependencies: `openpyxl`, `rapidfuzz`, `playwright`.
 
-## Testler
+To build the executable yourself: `pip install -r requirements-dev.txt` then
+`python paket_yap.py` (add `tek` for a single-file build).
 
-```bash
-python testler/testler.py             # 57 test — okuma, eşleştirme, mükerrer koruma
-python testler/dayaniklilik_testi.py  # 39 test — bozuk girdi, farklı banka düzenleri
-python testler/bozuk_excel_testi.py   # 17 test — kilitli/bozuk Excel kurtarma
-```
-
-Panele bağlanmadan uçtan uca denemek için:
+## Testing
 
 ```bash
-python demo/test_verisi_uret.py   # uydurma ekstre + kişi listesi üretir
-python demo/demo_calistir.py      # okur, eşleştirir, HTML rapor çıkarır
+python testler/testler.py             # 57 tests — reading, matching, duplicate guard
+python testler/dayaniklilik_testi.py  # 39 tests — malformed input, varied bank layouts
+python testler/bozuk_excel_testi.py   # 17 tests — corrupted Excel recovery
 ```
 
-Örnek çıktı: 41 hareket → 20 girilecek, 3 onay bekliyor, 18 elendi (banka masrafı,
-vergi, maaş, bağış, kira). Yanlış eşleşme yok.
+To try the whole pipeline end to end without touching any panel:
+
+```bash
+python demo/test_verisi_uret.py   # generates a fictional statement + roster
+python demo/demo_calistir.py      # reads, matches, writes an HTML report
+```
+
+Sample result: 41 transactions → 20 ready to enter, 3 awaiting confirmation,
+18 correctly rejected (bank fees, tax, payroll, donation, rent). No mismatches.
 
 ---
 
-## Veri ve sorumluluk
+## Data and responsibility
 
-- **Test ve örnek dosyalardaki tüm isimler, T.C. numaraları ve banka hareketleri
-  uydurmadır.** Gerçek kişi verisi bu depoda bulunmuyor. Test verisi
-  `demo/test_verisi_uret.py` tarafından üretiliyor; T.C. numaraları MERNIS
-  algoritmasına uygun ama gerçek kimseye ait değil.
-- Program hiçbir veriyi dışarı göndermez. Ne okuduğu ne yazdığı bilgisayardan çıkar.
-- Aktar, kullanıcının **kendi yetkisiyle, kendi oturumunda, kendi verisini** girmesini
-  hızlandırır. Erişim yetkisi olmayan bir sisteme giriş sağlamaz.
-- Bir kurum panelinde kullanmadan önce o kurumun kullanım şartlarını kontrol etmek
-  kullanıcının sorumluluğundadır.
+- **Every name, national id and bank transaction in this repository is
+  fictional.** No real personal data is present. The test data is generated by
+  [`demo/test_verisi_uret.py`](demo/test_verisi_uret.py); the national ids satisfy
+  the Turkish MERNIS checksum but belong to no one.
+- Aktar sends nothing anywhere. Neither what it reads nor what it writes leaves
+  the machine. There is no telemetry and no licence check.
+- It speeds up a user entering **their own data, in their own session, under
+  their own authority**. It does not obtain access to any system the user is not
+  already entitled to use.
+- Before using it against an institutional panel, checking that organisation's
+  terms of use is the user's responsibility.
 
-## Lisans
+## License
 
 MIT — Seyid Arda Zeybek
