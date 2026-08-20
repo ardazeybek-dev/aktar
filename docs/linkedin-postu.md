@@ -1,56 +1,77 @@
 # LinkedIn paylaşımı — Aktar
 
-> Kopyala-yapıştır için hazır. İlk üç satır kritik: LinkedIn gerisini "daha fazla"
-> arkasına saklıyor. Görsel olarak `docs/06-eslestirme-sonucu.png` ekle.
+> Kopyala-yapıştır için hazır. Görsel: `docs/06-eslestirme-sonucu.png`
+> (masaüstünde `Aktar-linkedin-gorsel.png` olarak da duruyor).
+> İlk üç satır kritik — LinkedIn gerisini "daha fazla" arkasına saklıyor.
 
 ---
 
-Aldığım bir freelance siparişi iptal oldu. Yazılım bitmişti.
+## English
 
-Kodu açık kaynak yaptım.
+I built a Windows desktop application and open-sourced it: **Aktar**.
 
-İş şuydu: bir anaokulu, veli aidatlarını devletin paneline elle giriyordu. Ayda 80-130 kayıt, her biri 9-10 tıklama. Yaklaşık iki iş günü, her ay.
+It reads a bank statement, works out who paid what, and enters the records into a web panel for you.
 
-Ama asıl zor kısım tıklamak değildi — ekstreyi anlamaktı. Veliler açıklamaya ne isterlerse onu yazıyor:
+The problem it solves is boring and expensive. An organisation that receives a hundred-odd transfers a month — a school, an association, a building management office, a small accounting practice — has to type every single one of them into some web panel by hand. Nine or ten clicks per record. Days of work, every month, forever.
 
-"Gönd: GAMZE KARTAL Mayıs ayı beren artal 0067-Yapı ve Kredi"
+The hard part is not the clicking. It is reading the statement. People write whatever they like in the transfer description: sometimes the payer's name, sometimes the child's, sometimes both, sometimes neither. A surname arrives missing its first letter. Four different families share one surname and must not be confused with each other. Mixed in are payments that are not fees at all and must never be entered.
 
-Çocuğun adı bazen başta, bazen sonda, bazen hiç yok — sadece annenin adı var. Soyadın baş harfi düşmüş. "klup / klüp / kulüb", "aidat / aydat". Üstelik aynı soyadlı dört ayrı aile var ve karıştırılmaması gerekiyor.
+What Aktar does:
 
-En çok uğraştığım soru şuydu: program bir eşleşmeye ne zaman "eminim" desin?
+→ **Reads the statement** — finds the header row on its own, parses Turkish number format (-22.936,29), discards the bank's letterhead and footnotes, and recovers Excel files that openpyxl refuses to open at all
 
-Cevap beklediğimden ilginç çıktı. Skor 91 olsa bile, ikinci aday 88'deyse program karar vermiyor — kullanıcıya soruyor. Çünkü aynı soyadlı iki aile varken yüksek skor "doğru" anlamına gelmiyor. Emin olunamayan hiçbir kayıt otomatik girilmiyor.
+→ **Matches every payment to a person** — Turkish-aware fuzzy matching, then rules each row certain / uncertain / none
 
-İkinci detay: bu tür kurumsal panellerin CSS id'leri sürüm değişince kayıyor ve otomasyon sessizce ölüyor. Bu yüzden alanları id'den değil, ekrandaki etiket metninden buluyorum — "Evrak No :" yazan hücrenin yanındaki input.
+→ **Enters the records into the panel** — Playwright, one record at a time, skipping and reporting anything that fails instead of dying halfway
 
-Bunu yazarken güzel bir tuzağa düştüm: sayfanın tamamını saran bir div de "Evrak No" metnini içerdiği için eşleşiyor ve yanlış alan bulunuyordu. Çözüm, XPath'e "içinde başka element olmayan düğüm" şartı eklemek oldu.
+Two decisions I am happy with:
 
-Motor hangi panele girdiğini bilmiyor. Panele özel her şey — adresler, alan etiketleri, ekran akışı — ayrı bir "tarif" dosyasında. Yeni bir panel eklemek, arayüze hiç dokunmadan tek dosya yazmak demek.
+**1. Precision over coverage.** Even at a match score of 91, if the runner-up sits at 88 the program refuses to decide and asks the user instead. When two families share a surname, a high score does not mean correct. A wrongly attributed payment costs far more than one a human confirms by hand.
 
-Python, Playwright, rapidfuzz, tkinter. 113 test. Windows için exe olarak da indirilebiliyor.
+**2. Fields are found by their label text, not by element id.** Legacy ASP.NET panels shift their ids between releases and automation dies silently. Aktar looks for the input next to the cell that reads "Evrak No :" instead. The subtle part: you have to require a leaf node, otherwise the div wrapping the whole page also contains that text and you fill the wrong field.
 
-Kod: github.com/ardazeybek-dev/aktar
+**Architecture:** the engine does not know the panel. Everything panel-specific — addresses, field labels, screen flow — lives in a separate *recipe* file. Adding a new panel means writing one file and touching no UI code at all.
 
-Not: Depodaki bütün isimler, T.C. numaraları ve banka hareketleri uydurma. Gerçek müşteri verisi yok.
+**No credentials are stored.** The user signs in themselves, the program waits, then enters the user's own data in the user's own session. Nothing leaves the machine.
 
-#python #opensource #otomasyon #playwright
+Python · Playwright · rapidfuzz · tkinter · 113 tests · MIT licensed
+
+Source: github.com/ardazeybek-dev/aktar
+
+#python #opensource #automation #playwright #softwareengineering
 
 ---
 
-## Alternatif kısa sürüm (daha çok etkileşim alır)
+## Türkçe
 
-Bir freelance siparişim iptal oldu. Yazılım bitmişti — açık kaynak yaptım.
+Bir Windows masaüstü uygulaması yazdım ve açık kaynak yaptım: **Aktar**.
 
-Program banka ekstresini okuyup "kim ne ödemiş"i çözüyor, sonra kayıtları web paneline giriyor. Ayda iki iş günü süren bir işi otomatikleştiriyor.
+Banka ekstresini okuyor, kimin ne ödediğini çözüyor ve kayıtları web paneline sizin yerinize giriyor.
 
-En zor kısmı tıklamak değil, bunu anlamaktı:
+Çözdüğü problem sıkıcı ve pahalı. Ayda yüz küsur havale alan bir kurum — okul, dernek, apartman yönetimi, küçük bir muhasebe bürosu — bunların her birini bir web paneline elle girmek zorunda. Kayıt başına dokuz on tıklama. Her ay, günlerce süren bir iş.
 
-"Gönd: GAMZE KARTAL Mayıs ayı beren artal"
+Zor kısım tıklamak değil. Ekstreyi okumak. İnsanlar açıklamaya ne isterlerse onu yazıyor: bazen ödeyenin adı, bazen çocuğun, bazen ikisi, bazen hiçbiri. Soyadın baş harfi düşüyor. Aynı soyadı taşıyan dört ayrı aile var ve karıştırılmaması gerekiyor. Arada aidat olmayan ödemeler var, onların hiç girilmemesi gerekiyor.
 
-Soyadın baş harfi düşmüş, çocuğun adı ortada, aynı soyadlı üç aile daha var.
+Aktar ne yapıyor:
 
-Öğrendiğim şey: bulanık eşleştirmede asıl mesele skoru yükseltmek değil, ne zaman "emin değilim" diyeceğini bilmek. Skor 91 olsa bile ikinci aday 88'deyse program karar vermiyor, kullanıcıya soruyor.
+→ **Ekstreyi okuyor** — başlık satırını kendi buluyor, Türkçe sayı formatını (-22.936,29) anlıyor, banka antetini ve dipnotlarını atıyor, openpyxl'in hiç açamadığı bozuk Excel dosyalarını kurtarıyor
 
-github.com/ardazeybek-dev/aktar
+→ **Her ödemeyi bir kişiyle eşleştiriyor** — Türkçeye özel bulanık eşleştirme, sonra her satıra kesin / şüpheli / yok kararı
 
-#python #opensource #otomasyon
+→ **Kayıtları panele giriyor** — Playwright ile, tek tek; bir kayıt patlarsa yarı yolda ölmüyor, o satırı atlayıp raporluyor
+
+Memnun olduğum iki karar:
+
+**1. Kapsamdan çok isabet.** Eşleşme skoru 91 olsa bile, ikinci aday 88'deyse program karar vermiyor, kullanıcıya soruyor. Aynı soyadlı iki aile varken yüksek skor "doğru" demek değil. Yanlış atanan bir ödeme, kullanıcının elle onayladığı ödemeden çok daha pahalıya patlıyor.
+
+**2. Alanlar element id'siyle değil, ekrandaki etiket metniyle bulunuyor.** Eski ASP.NET panellerinin id'leri sürüm değişince kayıyor ve otomasyon sessizce ölüyor. Aktar bunun yerine "Evrak No :" yazan hücrenin yanındaki input'u arıyor. İnce nokta: yaprak düğüm şartı koymak zorundasınız, yoksa sayfanın tamamını saran div de o metni içeriyor ve yanlış alanı dolduruyorsunuz.
+
+**Mimari:** motor hangi panele girdiğini bilmiyor. Panele özel her şey — adresler, alan etiketleri, ekran akışı — ayrı bir *tarif* dosyasında. Yeni bir panel eklemek, arayüze hiç dokunmadan tek dosya yazmak demek.
+
+**Hiçbir şifre saklanmıyor.** Girişi kullanıcı kendisi yapıyor, program bekliyor, sonra kullanıcının kendi verisini kendi oturumunda giriyor. Hiçbir veri bilgisayardan çıkmıyor.
+
+Python · Playwright · rapidfuzz · tkinter · 113 test · MIT lisansı
+
+Kaynak kod: github.com/ardazeybek-dev/aktar
+
+#python #açıkkaynak #otomasyon #playwright #yazılım
