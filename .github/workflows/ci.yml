@@ -68,7 +68,10 @@ jobs:
         run: pip install -r requirements.txt
       - name: UI wiring (16 checks)
         run: python testler/arayuz_akis_testi.py
-      - name: End-to-end flow (45 checks)
+      # 42 kontrol kosar. Kalan 3'u dugmenin ekranda GORUNEN rengini piksel
+      # olarak okur; paylasimlik bir kosucuda pencerenin ustunu bir sey
+      # ortmedigi garanti degil, o yuzden orada atlanip yerelde kosuyorlar.
+      - name: End-to-end flow (42 checks; 3 screen-colour ones skip here)
         run: python testler/uctan_uca_test.py
 
   # Stil degil, gercek hata avi: tanimsiz isim, sozdizimi hatasi, bozuk f-string.

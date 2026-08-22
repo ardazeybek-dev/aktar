@@ -228,7 +228,12 @@ atlanıyor mu.
 python testler/panel_prova.py         # 14 kontrol — headless, gerçek panele girilmez
 ```
 
-Masaüstü arayüzü, gerçekten açılarak:
+Masaüstü arayüzü, gerçekten açılarak. Uçtan uca koşudaki 3 kontrol, düğmenin
+ekranda **görünen** rengini piksel olarak okur — `cget('bg')` güvenilir değil:
+`indicatoron=False` olan `Radiobutton`'da yalan söylüyor ve bir keresinde seçili
+düğme bembeyaz çıktığı halde bunu göstermemişti. Bu üçü Pillow ve ekranı olan bir
+oturum ister; ikisi de yoksa atlanır ve kalan 42 kontrol yine koşar — CI'da
+görülen sayı bu yüzden 42:
 
 ```bash
 python testler/arayuz_akis_testi.py   # 16 kontrol — düğme durumları, iki aşamalı akış

@@ -277,7 +277,12 @@ without stopping the loop.
 python testler/panel_prova.py         # 14 checks — headless, no real panel touched
 ```
 
-The desktop UI, opened for real:
+The desktop UI, opened for real. Three of the checks in the end-to-end run read
+the **rendered** colour of a button off the screen rather than trusting
+`cget('bg')` — which lies for a `Radiobutton` with `indicatoron=False`, and once
+hid a selected button that was actually rendering white. Those three need Pillow
+and a session with a screen; without either they skip and the other 42 still run,
+so CI reports 42:
 
 ```bash
 python testler/arayuz_akis_testi.py   # 16 checks — button states, two-stage flow

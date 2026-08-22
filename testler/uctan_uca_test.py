@@ -116,7 +116,14 @@ def _dugme_rengi(pencere, dugme):
     """
     import time
 
-    from PIL import ImageGrab
+    # Pillow yalnizca bu kontrol icin gerekli; calisma zamani bagimliligi
+    # DEGIL (paket_yap.py onu build'den zaten haric tutuyor). Yoksa, ya da
+    # oturumun ekrani okunamiyorsa, renk kontrolu atlanir - testin geri
+    # kalani kosmaya devam eder.
+    try:
+        from PIL import ImageGrab
+    except ImportError:
+        return None
     try:
         pencere.attributes("-topmost", True)
         pencere.lift()
@@ -128,7 +135,12 @@ def _dugme_rengi(pencere, dugme):
 
     x = dugme.winfo_rootx() + 6
     y = dugme.winfo_rooty() + dugme.winfo_height() // 2
-    renk = ImageGrab.grab(bbox=(x, y, x + 3, y + 3)).getpixel((1, 1))[:3]
+    try:
+        renk = ImageGrab.grab(bbox=(x, y, x + 3, y + 3)).getpixel((1, 1))[:3]
+    except Exception:
+        # Ekransiz oturumda grab bos/siyah doner ya da patlar; yanlis
+        # kirmizi vermektense olcemedigimizi soyle.
+        renk = None
     try:
         pencere.attributes("-topmost", False)
     except Exception:
@@ -245,14 +257,18 @@ def arayuz_akisi(ayarlar: dict, gecici: Path) -> None:
     # mod dugmesine basinca SECILI OLDUGU GORULMELI (renk degismeli)
     oab = sonuclar.get("oab_renkleri", [])
     ilk = sonuclar.get("ilk_mod_renkleri", [])
-    kontrol("3. moda basinca o dugme EKRANDA mavi gorunur",
-            len(oab) == 4 and _renk_yakin(oab[2], MAVI), str(oab))
-    kontrol("secili olmayan mod dugmeleri koyu kalir (beyaz olmaz)",
-            len(oab) == 4 and all(_renk_yakin(oab[i], KOYU)
-                                  for i in (0, 1, 3)), str(oab))
-    kontrol("1. moda donunce secim ekranda geri gelir",
-            len(ilk) == 4 and _renk_yakin(ilk[0], MAVI)
-            and _renk_yakin(ilk[2], KOYU), str(ilk))
+    if not oab or not ilk or None in oab or None in ilk:
+        print("  [ATLA] ekran rengi okunamadi (Pillow yok ya da oturumun "
+              "ekrani yok) — 3 renk kontrolu atlandi")
+    else:
+        kontrol("3. moda basinca o dugme EKRANDA mavi gorunur",
+                len(oab) == 4 and _renk_yakin(oab[2], MAVI), str(oab))
+        kontrol("secili olmayan mod dugmeleri koyu kalir (beyaz olmaz)",
+                len(oab) == 4 and all(_renk_yakin(oab[i], KOYU)
+                                      for i in (0, 1, 3)), str(oab))
+        kontrol("1. moda donunce secim ekranda geri gelir",
+                len(ilk) == 4 and _renk_yakin(ilk[0], MAVI)
+                and _renk_yakin(ilk[2], KOYU), str(ilk))
     kontrol("secilen mod alt satirda yaziyor",
             "Okul Aile Birliği" in sonuclar.get("oab_durum", ""),
             sonuclar.get("oab_durum", ""))
