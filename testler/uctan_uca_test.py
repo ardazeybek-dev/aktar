@@ -25,6 +25,19 @@ import arayuz                                   # noqa: E402
 import sablon                                   # noqa: E402
 from ekstre import satirlari_oku                # noqa: E402
 
+# Konsol Turkce harfleri kodlayamiyorsa cokme, yerine '?' yaz. Windows'ta
+# varsayilan konsol kod sayfasi (cp1252/cp857) 'ı' veya 'ş' harfini kodlayamaz
+# ve programin TAMAMI tek bir print yuzunden UnicodeEncodeError ile duser.
+# Kodlamayi degistirmiyoruz - sadece kodlanamayani hataya donusturmuyoruz;
+# UTF-8 konsolda cikti yine kusursuz.
+for _akis in (sys.stdout, sys.stderr):
+    if hasattr(_akis, "reconfigure"):
+        try:
+            _akis.reconfigure(errors="replace")
+        except Exception:
+            pass
+
+
 EKSTRE = KOK / "demo" / "test_ekstre.xlsx"
 LISTE = KOK / "demo" / "test_liste.xlsx"
 
