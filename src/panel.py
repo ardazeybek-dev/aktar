@@ -346,10 +346,17 @@ class PanelOtomasyonu:
 
         # --disable-popup-blocking : bazi panellerde giris/secim ekrani yeni
         #   pencerede acilir, Chrome varsayilan olarak engeller.
+        # --disable-blink-features=AutomationControlled + ignore_default_args :
+        #   1. yol tutmadiginda tarayiciyi Playwright baslatir; bu durumda
+        #   Chrome "test yazilimi tarafindan kontrol ediliyor" cubugunu gosterir
+        #   ve bazi kurum panelleri girisi reddeder. Yedek yol da bu yuzden
+        #   otomasyon izini gizlemek zorunda — yoksa yedek yol ise yaramaz.
         ortak = {"headless": False, "args": [
             "--start-maximized",
             "--disable-popup-blocking",
-        ]}
+            "--disable-blink-features=AutomationControlled",
+        ],
+            "ignore_default_args": ["--enable-automation"]}
         son_hata = None
 
         # 2. YOL (yedek): Playwright tarayiciyi kendi baslatir.

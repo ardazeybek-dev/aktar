@@ -4,11 +4,12 @@
 
 **Reads a bank statement, works out who paid what, and enters the records into a web panel for you.**
 
+[![CI](https://github.com/ardazeybek-dev/aktar/actions/workflows/ci.yml/badge.svg)](https://github.com/ardazeybek-dev/aktar/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Playwright](https://img.shields.io/badge/playwright-1.40%2B-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev/python/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows&logoColor=white)](https://github.com/ardazeybek-dev/aktar/releases)
-[![Tests](https://img.shields.io/badge/tests-113%20passing-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/tests-200%20passing-brightgreen)](#testing)
 
 [Türkçe README](README.tr.md) · [Download for Windows](https://github.com/ardazeybek-dev/aktar/releases)
 
@@ -255,10 +256,41 @@ To build the executable yourself: `pip install -r requirements-dev.txt` then
 
 ## Testing
 
+Core logic — no browser, no display, so these run on every OS and Python
+version in CI:
+
 ```bash
 python testler/testler.py             # 57 tests — reading, matching, duplicate guard
 python testler/dayaniklilik_testi.py  # 39 tests — malformed input, varied bank layouts
 python testler/bozuk_excel_testi.py   # 17 tests — corrupted Excel recovery
+```
+
+The engine, driven by a real browser against the mock panel in
+`demo/sahte_tefbis/` — which carries the same labels and the same
+popup-and-return flow as the real thing. This is what proves the parts the
+unit tests cannot: that a field is found from its on-screen label, that
+`Tutar` is filled rather than `Toplam Tutar`, that the run comes back to the
+main page after the selection popup, and that an unknown record is skipped
+without stopping the loop.
+
+```bash
+python testler/panel_prova.py         # 14 checks — headless, no real panel touched
+```
+
+The desktop UI, opened for real:
+
+```bash
+python testler/arayuz_akis_testi.py   # 16 checks — button states, two-stage flow
+python testler/uctan_uca_test.py      # 45 checks — password → template → match → confirm → report
+```
+
+One more runs locally but is deliberately kept out of CI, because it opens a
+**visible** Chrome and attaches to it over CDP — the thing it verifies is that
+the browser looks like an ordinary one, which a headless runner cannot honestly
+measure:
+
+```bash
+python testler/tarayici_testi.py      # 12 checks — CDP attach, no automation banner
 ```
 
 To try the whole pipeline end to end without touching any panel:

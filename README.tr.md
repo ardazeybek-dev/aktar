@@ -2,10 +2,11 @@
 
 # Aktar
 
+[![CI](https://github.com/ardazeybek-dev/aktar/actions/workflows/ci.yml/badge.svg)](https://github.com/ardazeybek-dev/aktar/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Playwright](https://img.shields.io/badge/playwright-1.40%2B-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev/python/)
 [![Lisans](https://img.shields.io/badge/lisans-MIT-green)](LICENSE)
-[![Test](https://img.shields.io/badge/test-113%20ge%C3%A7iyor-brightgreen)](#testler)
+[![Test](https://img.shields.io/badge/test-200%20ge%C3%A7iyor-brightgreen)](#testler)
 
 [English README](README.md) · [Windows için indir](https://github.com/ardazeybek-dev/aktar/releases)
 
@@ -207,10 +208,39 @@ Python 3.11+. Bağımlılıklar: `openpyxl`, `rapidfuzz`, `playwright`.
 
 ## Testler
 
+Çekirdek mantık — tarayıcı da ekran da gerekmez, bu yüzden CI'da her işletim
+sistemi ve Python sürümünde koşar:
+
 ```bash
 python testler/testler.py             # 57 test — okuma, eşleştirme, mükerrer koruma
 python testler/dayaniklilik_testi.py  # 39 test — bozuk girdi, farklı banka düzenleri
 python testler/bozuk_excel_testi.py   # 17 test — kilitli/bozuk Excel kurtarma
+```
+
+Motorun `demo/sahte_tefbis/` üzerinde gerçek tarayıcıyla provası — sahte sayfa
+gerçek ekranın etiketlerini ve aynı "ayrı pencerede seç, ana sayfaya dön"
+akışını taşıyor. Birim testlerin ölçemediğini bu ölçüyor: alan ekrandaki
+etiketten bulunuyor mu, `Toplam Tutar` yerine `Tutar` mı doluyor, seçim
+penceresinden ana sayfaya dönülüyor mu, kayıtsız T.C. döngüyü durdurmadan
+atlanıyor mu.
+
+```bash
+python testler/panel_prova.py         # 14 kontrol — headless, gerçek panele girilmez
+```
+
+Masaüstü arayüzü, gerçekten açılarak:
+
+```bash
+python testler/arayuz_akis_testi.py   # 16 kontrol — düğme durumları, iki aşamalı akış
+python testler/uctan_uca_test.py      # 45 kontrol — şifre → şablon → eşleştir → onay → rapor
+```
+
+Bir tanesi yerelde çalışır ama CI'a bilerek konmadı: **görünür** bir Chrome
+açıp ona CDP ile bağlanıyor — doğruladığı şey tarayıcının sıradan görünmesi,
+ki bunu headless bir koşucu dürüstçe ölçemez:
+
+```bash
+python testler/tarayici_testi.py      # 12 kontrol — CDP bağlantısı, otomasyon çubuğu yok
 ```
 
 Panele bağlanmadan uçtan uca denemek için:

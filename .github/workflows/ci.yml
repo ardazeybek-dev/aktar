@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Cekirdek mantik: ekstre okuma, eslestirme, bozuk Excel kurtarma.
+  # Tarayici da ekran da gerekmez, bu yuzden tam matriste kosar.
+  cekirdek:
+    name: Core (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Core tests (57)
+        run: python testler/testler.py
+      - name: Resilience tests (39)
+        run: python testler/dayaniklilik_testi.py
+      - name: Corrupted Excel recovery tests (17)
+        run: python testler/bozuk_excel_testi.py
+
+  # Gercek bir tarayiciyla, demo/sahte_tefbis/ uzerinde tam motor provasi:
+  # etiketten alan bulma, acilan pencereden ana sayfaya donus, hata yalitimi.
+  motor:
+    name: Engine against the mock panel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Install the Chrome channel Playwright will drive
+        run: python -m playwright install --with-deps chrome
+      - name: Mock-panel run (14 checks)
+        run: python testler/panel_prova.py
+
+  # Tkinter arayuzunu gercekten acan akis testleri. Windows kosucusunda
+  # masaustu oturumu vardir; ubuntu'da xvfb gerekirdi, gerek yok.
+  arayuz:
+    name: Desktop UI flow
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: UI wiring (16 checks)
+        run: python testler/arayuz_akis_testi.py
+      - name: End-to-end flow (45 checks)
+        run: python testler/uctan_uca_test.py
+
+  # Stil degil, gercek hata avi: tanimsiz isim, sozdizimi hatasi, bozuk f-string.
+  # Kod Turkce yazildi; stil kurallarini dayatmak gurultuden baska bir sey uretmez.
+  hata_taramasi:
+    name: Error scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install ruff
+        run: pip install ruff
+      - name: Undefined names and syntax errors only
+        run: ruff check --select E9,F63,F7,F82,F821 src testler demo
